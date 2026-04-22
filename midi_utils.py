@@ -7,9 +7,48 @@ import pretty_midi
 import kagglehub
 
 
-def parse_midi_file(file_path):
+def parse_midi_file(file_path, target_bpm=None, normalize_key=False):
     try:
         midi_data = pretty_midi.PrettyMIDI(file_path)
+
+        # --- TEMPO SCALING LOGIC ---
+        if target_bpm is not None:
+            try:
+                current_tempo = midi_data.estimate_tempo()
+                if current_tempo > 0:
+                    scale_factor = current_tempo / target_bpm
+                    for instrument in midi_data.instruments:
+                        for note in instrument.notes:
+                            note.start *= scale_factor
+                            note.end *= scale_factor
+            except Exception:
+                pass
+
+        # --- NEW KEY NORMALIZATION LOGIC ---
+        if normalize_key and len(midi_data.key_signature_changes) > 0:
+            original_key = midi_data.key_signature_changes[0].key_number
+            is_minor = original_key >= 12
+
+            # Target keys: 0 (C Major) for Major, 21 (A Minor) for Minor
+            target_key = 21 if is_minor else 0
+
+            # Calculate shortest pitch shift (-6 to +5 semitones)
+            root_note = original_key % 12
+            target_root = target_key % 12
+
+            shift = (target_root - root_note) % 12
+            if shift > 6:
+                shift -= 12
+
+            # Apply the shift to all non-drum notes
+            for instrument in midi_data.instruments:
+                if not instrument.is_drum:
+                    for note in instrument.notes:
+                        note.pitch += shift
+                        # Clamp to valid MIDI range (0-127) just to be safe
+                        note.pitch = max(0, min(127, note.pitch))
+        # -----------------------------------
+
         notes = []
         for instrument in midi_data.instruments:
             if not instrument.is_drum:

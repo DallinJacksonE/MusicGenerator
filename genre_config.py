@@ -15,6 +15,8 @@ BASE_CONFIG = {
     "tensor_dir": "tensor_data/phase1_general",
     "epochs": 30,
     "lr": 1e-4,
+    "target_bpm": 120,
+    "normalize_key": False,
     "weights_file": "phase1_weights.pth"
 }
 
@@ -30,6 +32,8 @@ GENRE_REGISTRY = {
         "tensor_dir": "tensor_data/genre_lofi",
         "epochs": 50,
         "lr": 1e-5,
+        "target_bpm": 75,
+        "normalize_key": True,
         "allowed_instruments": [0, 4, 5, 32]  # Piano, EPiano, Bass
     },
     "metal": {
@@ -40,6 +44,8 @@ GENRE_REGISTRY = {
         "tensor_dir": "tensor_data/genre_metal",
         "epochs": 15,
         "lr": 1e-5,
+        "target_bpm": 140,
+        "normalize_key": True,
         # Overdrive Guitar, Distortion Guitar, Picked Bass, Synth Drum
         "allowed_instruments": [29, 30, 34, 118]
     }

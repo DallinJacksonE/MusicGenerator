@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Selected Device: {device}")
-    model = MIDITransformer(d_model=128, nhead=4, num_layers=4).to(device)
+    model = MIDITransformer(d_model=256, nhead=8, num_layers=6).to(device)
 
     # =====================================================================
     # PHASE 1: General Music Pre-Training
@@ -95,7 +95,25 @@ if __name__ == "__main__":
                 weights_only=True))
 
         full_dataset = MIDIDataset(genre_data["tensor_dir"])
+        total_files = len(full_dataset)
+        print(f"[INFO] Loaded {total_files} tensors for {ACTIVE_GENRE}.")
 
+        if total_files == 0:
+            raise RuntimeError(f"0 files found for "
+                               f"{ACTIVE_GENRE}! Lower "
+                               f"SEQ_LENGTH in preprocess.py.")
+        elif total_files == 1:
+            print(
+                f"[WARNING] Only 1 file found. "
+                f"Bypassing split to prevent DataLoader crash.")
+            train_dataset = full_dataset
+            val_dataset = full_dataset
+        else:
+            # Calculate split sizes safely
+            val_size = max(1, int(0.1 * total_files))
+            train_size = total_files - val_size
+            train_dataset, val_dataset = random_split(
+                full_dataset, [train_size, val_size])
         # Calculate split sizes (90% Train, 10% Validation)
         # Ensure at least 1 file in validation if dataset is tiny
         val_size = max(1, int(0.1 * len(full_dataset)))

@@ -5,15 +5,15 @@ from tqdm import tqdm
 
 from midi_utils import get_midi_files, parse_midi_file, download_kaggle_datasets
 from genre_config import BASE_CONFIG, GENRE_REGISTRY
-SEQ_LENGTH = 50
+SEQ_LENGTH = 128
 
 
 def process_single_file(args):
     """Parses a single MIDI file and saves it as a PyTorch tensor."""
-    file_path, tensor_dir = args
+    file_path, tensor_dir, target_bpm, normalize_key = args
 
     try:
-        notes = parse_midi_file(file_path)
+        notes = parse_midi_file(file_path, target_bpm, normalize_key)
 
         if not notes or len(notes) < SEQ_LENGTH + 1:
             return False
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     print("\n--- Step 2: Multithreaded Tensor Conversion ---")
 
-    # Combine Base Config and Genre Configs into one iterable list for processing
+    # Combine Base Config and Genre Configs into one list for processing
     all_phases = [BASE_CONFIG] + list(GENRE_REGISTRY.values())
 
     for phase in all_phases:
@@ -79,10 +79,17 @@ if __name__ == "__main__":
                   phase_name}. Skipping conversion.")
             continue
 
-        process_args = [(f, tensor_dir) for f in raw_files]
+        target_bpm = phase.get("target_bpm", None)
+        normalize_key = phase.get("normalize_key", False)
+
+        # Append it to the tuple passed to the thread pool
+        process_args = [(f, tensor_dir, target_bpm, normalize_key)
+                        for f in raw_files]
         with ProcessPoolExecutor(max_workers=14) as executor:
-            results = list(tqdm(executor.map(process_single_file, process_args), total=len(
-                raw_files), desc=f"Converting {phase_name}"))
+            results = list(tqdm(executor.map(process_single_file,
+                                             process_args),
+                                total=len(raw_files),
+                                desc=f"Converting {phase_name}"))
             successful_conversions = sum(1 for r in results if r)
 
         print(f"Successfully converted {
