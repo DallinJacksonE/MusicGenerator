@@ -294,7 +294,7 @@ if __name__ == "__main__":
               len(phase2_dataloader)} (Batch Size: {OPT_BATCH_SIZE})")
 
         optimizer_p2 = optim.Adam(model.parameters(), lr=1e-5)
-        num_epochs_p2 = 30
+        num_epochs_p2 = 50
         checkpoint_dir2 = 'checkpoints/phase2'
         os.makedirs(checkpoint_dir2, exist_ok=True)
         epoch_losses_2 = []
@@ -377,7 +377,7 @@ if __name__ == "__main__":
               len(phase3_dataloader)} (Batch Size: {OPT_BATCH_SIZE})")
 
         optimizer_p3 = optim.Adam(model.parameters(), lr=1e-5)
-        num_epochs_p3 = 20
+        num_epochs_p3 = 10
         checkpoint_dir3 = 'checkpoints/phase3'
         os.makedirs(checkpoint_dir3, exist_ok=True)
         epoch_losses_3 = []

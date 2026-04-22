@@ -13,3 +13,4 @@ __pycache__/
 
 /tensor_data/
 /training_data/
+/checkpoints/
