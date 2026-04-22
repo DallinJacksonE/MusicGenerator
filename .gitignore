@@ -1,0 +1,15 @@
+/
+# Python virtual environment
+/venv/
+
+# Kaggle dataset downloads
+/kaggle_downloads/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+/tensor_data/
+/training_data/
