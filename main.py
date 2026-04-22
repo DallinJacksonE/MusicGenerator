@@ -164,9 +164,9 @@ def generate_music(model, start_note, device, num_notes=100, temperature=1.0):
 if __name__ == "__main__":
 
     # Execution Flags (Toggle these to run specific phases)
-    RUN_PHASE_1 = True
-    RUN_PHASE_2 = True
-    RUN_PHASE_3 = True
+    RUN_PHASE_1 = False
+    RUN_PHASE_2 = False
+    RUN_PHASE_3 = False
 
     # Hardware Tuning Parameters
     OPT_BATCH_SIZE = 32  # Massive chunk for 8GB VRAM
@@ -435,20 +435,31 @@ if __name__ == "__main__":
         plt.savefig('phase3_loss_plot.png')
         plt.close()
 
-    # =====================================================================
+# =====================================================================
     # POST-TRAINING GENERATION
     # =====================================================================
     print("\n" + "="*50)
-    print("FINAL MODEL GENERATION")
+    print("FINAL MODEL GENERATION (LOFI)")
     print("="*50)
 
+    # Explicitly load the Phase 2 (LoFi) weights
+    if os.path.exists('phase2_weights.pth'):
+        print("Loading Phase 2 LoFi weights...")
+        model.load_state_dict(torch.load(
+            'phase2_weights.pth', map_location=device))
+    else:
+        print(
+            "WARNING: phase2_weights.pth not found. Generating with whatever is in memory.")
+
+    # Seed the model with a Middle C on an Acoustic Grand Piano
     start_note = torch.tensor([[[60.0, 80.0, 0.5, 0.0]]], dtype=torch.float32)
 
-    print("Generating post-training sequence (150 notes)...")
-    generated_seq = generate_music(
-        model, start_note, device, num_notes=150, temperature=1.2)
+    print("Generating pure LoFi sequence (150 notes)...")
 
-    output_name = "final_trained_output.mid"
+    # Dropped temperature from 1.2 to 0.85 for musical coherence
+    generated_seq = generate_music(
+        model, start_note, device, num_notes=150, temperature=0.85)
+
+    output_name = "pure_lofi_output.mid"
     sequence_to_midi(generated_seq, output_filename=output_name)
-    print(f"\nTraining and generation complete! Check {
-          output_name} to hear the results.")
+    print(f"\nGeneration complete! Check {output_name} to hear the results.")
