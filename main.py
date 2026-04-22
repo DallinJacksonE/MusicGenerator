@@ -17,12 +17,12 @@ warnings.filterwarnings("ignore", category=UserWarning,
 if __name__ == "__main__":
 
     # --- PIPELINE CONTROLS ---
-    RUN_PRETRAIN = True      # Phase 1: General Music
+    RUN_PRETRAIN = False      # Phase 1: General Music
     RUN_FINETUNE = True       # Phase 2: Targeted Genre
 
     # Select your genre right here!
     # Must match a key in GENRE_REGISTRY (e.g., "lofi", "metal")
-    ACTIVE_GENRE = "lofi"
+    ACTIVE_GENRE = "metal"
 
     OPT_BATCH_SIZE = 32
     OPT_WORKERS = 8
