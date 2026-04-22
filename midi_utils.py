@@ -89,13 +89,19 @@ def filter_valid_midi_files(file_paths, min_notes=50):
 def sequence_to_midi(sequence, output_filename='generated_track.mid'):
     midi = pretty_midi.PrettyMIDI()
     instruments_dict = {}
-    current_time = 0.0
 
+    current_time = 0.0
     for note_features in sequence:
         pitch = int(max(0, min(127, note_features[0].item())))
         velocity = int(max(0, min(127, note_features[1].item())))
         duration = note_features[2].item()
         inst_program = int(max(0, min(127, note_features[3].item())))
+
+        # Extract the new Delta Time feature
+        delta = max(0.0, note_features[4].item())
+
+        # Move the timeline forward by delta, NOT duration!
+        current_time += delta
 
         if inst_program not in instruments_dict:
             new_inst = pretty_midi.Instrument(program=inst_program)
@@ -109,7 +115,6 @@ def sequence_to_midi(sequence, output_filename='generated_track.mid'):
             end=current_time + duration
         )
         instruments_dict[inst_program].notes.append(note)
-        current_time += duration
 
     midi.write(output_filename)
     print(f"Saved generated music to {output_filename}")
