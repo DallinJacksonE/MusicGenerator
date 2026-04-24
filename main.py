@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # Select your genre right here!
     # Must match a key in GENRE_REGISTRY (e.g., "lofi", "metal")
-    ACTIVE_GENRE = "metal"
+    ACTIVE_GENRE = "classical"
 
     OPT_BATCH_SIZE = 32
     OPT_WORKERS = 8

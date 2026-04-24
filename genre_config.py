@@ -48,6 +48,21 @@ GENRE_REGISTRY = {
         "normalize_key": True,
         # Overdrive Guitar, Distortion Guitar, Picked Bass, Synth Drum
         "allowed_instruments": [29, 30, 34, 118]
+    },
+    "classical": {
+        "kaggle_datasets": [
+            "blanderbuss/midi-classic-music",
+            "soumikrakshit/classical-music-midi",
+            "kritanjalijain/maestropianomidi",
+            "charliecodex/classical-music"
+        ],
+        "raw_dir": "training_data/genre_metal",
+        "tensor_dir": "tensor_data/genre_metal",
+        "epochs": 15,
+        "lr": 1e-5,
+        "target_bpm": 90,
+        "normalize_key": True,
+        "allowed_instruments": [0, 1]
     }
     # Want to add jazz? Just drop a "jazz": {...} block right here!
 }
